@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="icon" href="/favicon.ico">
+        <title>App Two Index Page</title>
+
+        {# htmlWebpackPlugin.tags.headTags requires html-weback-plugin 4.0 we have 3.2 #}
+        {# with 3.2 the "way" is to loop over htmlWebpackPlugin.files.css for CSS #}
+        
+        {# we can also loop over JS files here, marking them as preload #}
+        
+            <link href="/static/js/chunk-vendors.js" rel="preload" as="script">
+        
+            <link href="/static/js/app_two.js" rel="preload" as="script">
+        
+
+    </head>
+    <body>
+        <noscript>
+            <strong>We're sorry but App Two Index Page doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        </noscript>
+        <div id="apptwo"></div>
+        {# inject all webpack chunks #}
+        {# htmlWebpackPlugin.tags.bodyTags requires html-weback-plugin 4.0 we have 3.2 #}
+        {# with 3.2 the "way" is to loop over htmlWebpackPlugin.files.chunks for JS #}
+        
+        <script src="/static/js/chunk-vendors.js"></script>
+        
+        <script src="/static/js/app_two.js"></script>
+        
+    </body>
+</html>

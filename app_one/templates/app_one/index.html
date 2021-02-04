@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="icon" href="/favicon.ico">
+        <title>App One Index Page</title>
+
+        {# htmlWebpackPlugin.tags.headTags requires html-weback-plugin 4.0 we have 3.2 #}
+        {# with 3.2 the "way" is to loop over htmlWebpackPlugin.files.css for CSS #}
+        
+        {# we can also loop over JS files here, marking them as preload #}
+        
+        <link href="/static/js/chunk-vendors.js" rel="preload" as="script">
+        
+        <link href="/static/js/app_one.js" rel="preload" as="script">
+        
+
+    </head>
+    <body>
+        <noscript>
+            <strong>We're sorry but App One Index Page doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        </noscript>
+
+        <hr />
+        <p>files object</p>
+        <ul>
+            
+            <li>
+                publicPath (string): /
+            </li>
+            
+            <li>
+                chunks (object): [object Object]
+            </li>
+            
+            <li>
+                js (object): /static/js/chunk-vendors.js,/static/js/app_one.js
+            </li>
+            
+            <li>
+                css (object): 
+            </li>
+            
+            <li>
+                manifest (undefined): 
+            </li>
+            
+        </ul>
+        <hr />
+        <p>chunks object</p>
+        <ul>
+            
+            <li>
+                chunk-vendors (object): [object Object]
+            </li>
+            
+            <li>
+                app_one (object): [object Object]
+            </li>
+            
+        </ul>
+        <hr />
+        <p>css object</p>
+        <ul>
+            
+        </ul>
+        <hr />
+        <p>js object</p>
+        <ul>
+            
+            <li>
+                0 (string): /static/js/chunk-vendors.js
+            </li>
+            
+            <li>
+                1 (string): /static/js/app_one.js
+            </li>
+            
+        </ul>
+        <hr />
+
+        <div id="appone"></div>
+        {# re-inject all webpack chunks since the "auto injection" will be outside the template #}
+        {# htmlWebpackPlugin.tags.bodyTags  requires html-weback-plugin 4.0 we have 3.2 #}
+        {# with 3.2 the "way" is to loop over htmlWebpackPlugin.files.chunks for JS #}
+        
+        <script src="/static/js/chunk-vendors.js"></script>
+        
+        <script src="/static/js/app_one.js"></script>
+        
+    </body>
+</html>

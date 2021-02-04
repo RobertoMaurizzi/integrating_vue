@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+        <title><%= htmlWebpackPlugin.options.title %></title>
+
+        {# htmlWebpackPlugin.tags.headTags requires html-weback-plugin 4.0 we have 3.2 #}
+        {# with 3.2 the "way" is to loop over htmlWebpackPlugin.files.css for CSS #}
+        <% for (var item in htmlWebpackPlugin.files.css) { %>
+        <link href="<%= htmlWebpackPlugin.files.css[item] %>" rel="preload" as="style">
+        <link href="<%= htmlWebpackPlugin.files.css[item] %>" rel="stylesheet">
+        <% } %>
+        {# we can also loop over JS files here, marking them as preload #}
+        <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+        <link href="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>" rel="preload" as="script">
+        <% } %>
+
+    </head>
+    <body>
+        <noscript>
+            <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        </noscript>
+
+        <hr />
+        <p>files object</p>
+        <ul>
+            <% for (var obj in htmlWebpackPlugin.files) { %>
+            <li>
+                <%= obj %> (<%= typeof(htmlWebpackPlugin.files[obj]) %>): <%= htmlWebpackPlugin.files[obj] %>
+            </li>
+            <% } %>
+        </ul>
+        <hr />
+        <p>chunks object</p>
+        <ul>
+            <% for (var obj in htmlWebpackPlugin.files.chunks) { %>
+            <li>
+                <%= obj %> (<%= typeof(htmlWebpackPlugin.files.chunks[obj]) %>): <%= htmlWebpackPlugin.files.chunks[obj] %>
+            </li>
+            <% } %>
+        </ul>
+        <hr />
+        <p>css object</p>
+        <ul>
+            <% for (var obj in htmlWebpackPlugin.files.css) { %>
+            <li>
+                <%= obj %> (<%= typeof(htmlWebpackPlugin.files.css[obj]) %>): <%= htmlWebpackPlugin.files.css[obj] %>
+            </li>
+            <% } %>
+        </ul>
+        <hr />
+        <p>js object</p>
+        <ul>
+            <% for (var obj in htmlWebpackPlugin.files.js) { %>
+            <li>
+                <%= obj %> (<%= typeof(htmlWebpackPlugin.files.js[obj]) %>): <%= htmlWebpackPlugin.files.js[obj] %>
+            </li>
+            <% } %>
+        </ul>
+        <hr />
+
+        <div id="appone"></div>
+        {# re-inject all webpack chunks since the "auto injection" will be outside the template #}
+        {# htmlWebpackPlugin.tags.bodyTags  requires html-weback-plugin 4.0 we have 3.2 #}
+        {# with 3.2 the "way" is to loop over htmlWebpackPlugin.files.chunks for JS #}
+        <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+        <script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+        <% } %>
+    </body>
+</html>
