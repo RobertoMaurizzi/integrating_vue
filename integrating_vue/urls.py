@@ -13,11 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 
 from app_one import views as appone_views
 from app_two import views as apptwo_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,3 +29,17 @@ urlpatterns = [
 
     path('apptwo/', apptwo_views.index, name="two_index"),
 ]
+
+# Let's proxy hot update requests to webpack-dev-server since they can't
+# apparently it DOES work without this, but you'll get errors in the browser console
+if settings.DEBUG:
+    try:
+        from revproxy.views import ProxyView
+    except ImportError:
+        pass
+    else:
+        urlpatterns += [
+            re_path(r'(?P<path>.*\.hot-update\..*)$',
+                    ProxyView.as_view(upstream=settings.WEBPACK_DEVSERVER_URL),
+                    name='hotreload_proxy'),
+        ]

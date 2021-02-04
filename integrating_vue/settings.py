@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'revproxy',
+
     'app_one',
     'app_two',
 ]
@@ -117,6 +119,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+WEBPACK_DEVSERVER_URL = "http://127.0.0.1:8081"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
