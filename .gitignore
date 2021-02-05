@@ -4,6 +4,8 @@
 bower_components
 node_modules
 /dist
+ejs_index.html
+
 
 # local env files
 .env.local
