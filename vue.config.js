@@ -9,7 +9,7 @@ module.exports = {
             // the source template
             template: 'app_one/frontend/one_index.html',
             // output as dist/index.html
-            filename: '../app_one/templates/app_one/index.html',
+            filename: '../app_one/templates/app_one/ejs_index.html',
             // when using title option,
             // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
             title: 'App One Index Page',
@@ -23,7 +23,7 @@ module.exports = {
             // the source template
             template: 'app_two/frontend/two_index.html',
             // output as dist/index.html
-            filename: '../app_two/templates/app_two/index.html',
+            filename: '../app_two/templates/app_two/ejs_index.html',
             // when using title option,
             // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
             title: 'App Two Index Page',
@@ -58,5 +58,4 @@ module.exports = {
     },
     outputDir: './dist',
     assetsDir: "static",
-    indexPath: '../templates/data_man/vue_index.html'
 }

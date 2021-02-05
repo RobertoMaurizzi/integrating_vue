@@ -1,6 +1,8 @@
-#  Django/webpack integration
+Django/Vue-cli integration tutorial
+===========================
 
-## Overview
+Overview
+-----------
 
 A typical Django "project" is composed of a number of "applications" each with their `templates` and `static` subfolders, to name only those that will be relevant to integrate Django and Webpack in a possibly decent way
 
@@ -48,7 +50,8 @@ The important observation made by Pascal Widdershoven [here](https://pascalw.me/
 
 The general idea is that, if we can tell Webpack to store its output in a `/static/` directory, either an existing one or one we add for its private use, then we'll be able to access those files directly from Django without needing any additional tool or integration: Webpack's dev server will output its temporary JS in those folders and the final output of a `build` will also be there, waiting for a `collectstatic` to deploy it where it needs to be.
 
-## New project structure
+New project structure
+-------------------------
 
 The idea behind the integration is to extend an old Django application by "merging" on top of it a Vue 3 application created with `vue-cli` . We can get our Django `project_folder` and run a `vue create project_folder` to have Vue-cli add all the required structure to use Vue, its plugins, Webpack and the rest of the  merry madness that comes with it.
 
@@ -71,7 +74,8 @@ rm -r src public
 # or copy files from src/assets, src/components and public/index.html to your applications as starting point
 ```
 
-## `vue.config.js` file for Django integration
+`vue.config.js` file for Django integration
+-----------------------------------------------------
 
 To make this work we need to tell Vue-cli quite a bit of things about where are our files and where we want to put the result of all the packing and bundling
 
@@ -89,7 +93,7 @@ module.exports = {
             template: 'app_one/frontend/one_index.html',
             // the output template needs to be in this app's templates directory
             // these compiled templates should not be included in git
-            filename: '../app_one/templates/app_one/index.html',
+            filename: '../app_one/templates/app_one/ejs_index.html',
             // when using title option,
             // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
             title: 'App One Index Page',
@@ -100,7 +104,7 @@ module.exports = {
         app_two: {
             entry: 'app_two/frontend/two_main.js',
             template: 'app_two/frontend/two_index.html',
-            filename: '../app_two/templates/app_two/index.html',
+            filename: '../app_two/templates/app_two/ejs_index.html',
             title: 'App Two Index Page',
             chunks: ['chunk-vendors', 'chunk-common', 'index']
         },
@@ -150,9 +154,16 @@ module.exports = {
 ```
 
 This will create a `integrating_vue/dist/static` folder where Webpack will store all the artifacts produced during `serve` or `build`.
-In addition to that we'll have, for each Django app, pre-processed templates files stored in the corresponding `app_xxx/templates/app_xxx/` directory. The templates will need to include all the CSS and JS files produced by Webpack.
+In addition to that we'll have, for each Django app, pre-processed templates files stored in the corresponding `app_xxx/templates/app_xxx/` directory.
 
-## How to inject CSS and JS bundles in a HTML template file 
+The pjs-converted-to-django-templates.html files in the application's template directories *will* get recreated every time there's a change in either the original template in /frontend/ or anything changes in the files related to the application and Webpack rebuilds them with a different hash. They can of course be called with any name, but if we stick to a standard name like `ejs_index.html` we can add it to `.gitignore` so they won't be added to the repository: they'll be recreated on deploy when `npm run build` is run.
+
+In case something about what Webpack is doing isn't obvious, remember you can run `vue inspect | less` to see what Vue generates for Webpack to process (it'll contain, as a minimum, the names of the plugins for your applications, like `html-app_one`)
+
+The templates will need to include all the CSS and JS files produced by Webpack and since we disable automatic injection we're going to add the necessary <link> and <script> tags using the EJS templating language.
+
+How to inject CSS and JS bundles in a HTML template file
+--------------------------------------------------------------------
 
 The template will be valid for both Webpack HTML generation (EJS) and Django (Django template language or Jinja). To have more control about where and how our CSS and JS bundles are injected, we disabled automatic injection of those files above (controlled bt html-webpack-plugin, named "html" by Vue-cli) and we have EJS code to re-add them in the template blocks were they're needed, for example:
 
@@ -263,5 +274,66 @@ in case you need some debugging of what (and when... development != production) 
 <hr />
 ```
 
+Changes to Django settings.py
+-----------------------------------
 
+Add the two apps to INSTALLED_APPS
+
+```
+
+  37┊  36│    'django.contrib.sessions',
+  38┊  37│    'django.contrib.messages',
+  39┊  38│    'django.contrib.staticfiles',
+    ┊  39│
+    ┊  40│    'app_one',
+    ┊  41│    'app_two',
+  40┊  42│]
+  41┊  43│
+  42┊  44│MIDDLEWARE = [
+```
+
+At the end of the file, add STATICFILES_DIR to enable collecting static files from `dist/static` and the STATICFILE_FINDERS to explore both apps and directories for them
+
+```delta
+───────────────────┐
+120: USE_TZ = True │
+───────────────────┘
+ 118┊ 120│# https://docs.djangoproject.com/en/3.1/howto/static-files/
+ 119┊ 121│
+ 120┊ 122│STATIC_URL = '/static/'
+    ┊ 123│STATICFILES_DIRS = (
+    ┊ 124│    BASE_DIR / 'dist' / 'static',   # Vue assets static dir
+    ┊ 125│)
+    ┊ 126│
+    ┊ 127│# List of finder classes that know how to find static files in
+    ┊ 128│# various locations.
+    ┊ 129│STATICFILES_FINDERS = [
+    ┊ 130│    'django.contrib.staticfiles.finders.FileSystemFinder',
+    ┊ 131│    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ┊ 132│    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    ┊ 133│]
+
+
+```
+
+Another useful addition (unrelated with Vue) is to create a templates folder inside the project settings directory (the one where the settings.py file is) so that we can have "project wide templates" and "global template overrides".
+
+```delta
+  56┊  56│TEMPLATES = [
+  57┊  57│    {
+  58┊  58│        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+  59┊    │        'DIRS': [],
+    ┊  59│        'DIRS': [
+    ┊  60│            BASE_DIR / 'integrating_vue' / 'templates'
+    ┊  61│        ],
+  60┊  62│        'APP_DIRS': True,
+  61┊  63│        'OPTIONS': {
+  62┊  64│            'context_processors': [
+
+```
+
+Other notes
+--------------
+
+Files like the application's `favicon.ico` need to be served from any `static` directory. We can use any from any application. Keep in mind that out of the box these files aren't managed by Webpack. This is probably a missing configuration that might be remedied in the future, but it's a minor thing, since using Django static we can't have more than one favicon.ico per project unless we call them with different filenames then load the appropriate one from the application template... and if we do that we don't need special support from Vue/Webpack.
 
