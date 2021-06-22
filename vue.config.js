@@ -1,5 +1,5 @@
 // vue.config.js
-// const path = require("path");
+const path = require("path");
 
 module.exports = {
     pages: {
@@ -47,7 +47,7 @@ module.exports = {
                 args[0].inject = false
                 args[0].chunks.push('app_one')
                 return args
-            })
+            });
         config
             .plugin('html-app_two')
             .tap(args => {
@@ -55,6 +55,9 @@ module.exports = {
                 args[0].chunks.push('app_two')
                 return args
             });
+        // add aliases for importing modules from @app_one/components or @app_two/components
+        config.resolve.alias.set('@app_one', path.join(__dirname, 'app_one/frontend'));
+        config.resolve.alias.set('@app_two', path.join(__dirname, 'app_two/frontend'));
     },
     outputDir: './dist',
     assetsDir: "static",
