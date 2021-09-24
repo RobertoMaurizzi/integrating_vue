@@ -30,14 +30,17 @@ urlpatterns = [
     path('apptwo/', apptwo_views.index, name="two_index"),
 ]
 
-# Let's proxy hot update requests to webpack-dev-server since they can't
-# apparently it DOES work without this, but you'll get errors in the browser console
+# In developement, proxy hot update requests to webpack-dev-server since they can't
 if settings.DEBUG:
     try:
         from revproxy.views import ProxyView
     except ImportError:
         pass
     else:
+        from revproxy import utils
+        # responses bigger than MIN_STREAMING_LENGTH are streamed, breaking Webpack dev server
+        # We monkey patch it to a big enough value, here 256MB
+        utils.MIN_STREAMING_LENGTH = 256 * 1024 * 1024  # noqa
         urlpatterns += [
             re_path(r'(?P<path>.*\.hot-update\..*)$',
                     ProxyView.as_view(upstream=settings.WEBPACK_DEVSERVER_URL),
